@@ -1,7 +1,8 @@
 const bcrypt = require("bcrypt");
-const { StatusCodes } = require("http-status-codes");
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
+const { StatusCodes } = require("http-status-codes");
+const  User  = require("../../models/user");
+const crypto = require("crypto");
 
 const register = async (req, res) => {
   const { username, firstName, lastName, email, password } = req.body;
@@ -110,18 +111,73 @@ const login = async (req, res) => {
   }
 };
 
-const checkAuth = async (req, res) => {
-  const { username, userId } = req.user;
-  res.status(StatusCodes.OK).json({
-    status: "success",
-    msg: "User is authenticated",
-    username,
-    userId,
-  });
+const resetPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: "fail",
+        msg: "No user found with that email",
+      });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    user.resetToken = resetToken;
+    user.resetTokenExpiration = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    // Send reset password email here...
+
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      msg: "Password reset token sent to email",
+    });
+  } catch (error) {
+    console.error("Error resetting password:", error.message);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ status: "fail", msg: "Internal server error" });
+  }
+};
+
+const newPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+  try {
+    const user = await User.findOne({
+      resetToken: token,
+      resetTokenExpiration: { $gt: Date.now() },
+    });
+    if (!user) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: "fail",
+        msg: "Invalid or expired token",
+      });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.resetToken = undefined;
+    user.resetTokenExpiration = undefined;
+    await user.save();
+
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      msg: "Password reset successfully",
+    });
+  } catch (error) {
+    console.error("Error setting new password:", error.message);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ status: "fail", msg: "Internal server error" });
+  }
 };
 
 module.exports = {
   register,
   login,
-  checkAuth,
+  resetPassword,
+  newPassword,
 };

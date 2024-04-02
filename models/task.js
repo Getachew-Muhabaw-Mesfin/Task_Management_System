@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema(
@@ -31,10 +30,6 @@ const taskSchema = new mongoose.Schema(
       default: false,
     },
     completedAt: Date,
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-    },
   },
   {
     timestamps: true,
