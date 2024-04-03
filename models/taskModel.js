@@ -4,17 +4,20 @@ const taskSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Please enter the title of the task"],
+      required: [true, "Please provide a title for the task"],
     },
-    description: String,
+    description: {
+      type: String,
+      required: [true, "Please provide a description for the task"],
+    },
     dueDate: {
       type: Date,
-      required: [true, "Please enter the due date of the task"],
+      required: [true, "Please provide a due date for the task"],
     },
     priority: {
       type: String,
-      enum: ["Low", "Medium", "High"],
-      required: [true, "Please select the priority of the task"],
+      enum: ["low", "medium", "high"],
+      default: "medium",
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
@@ -29,11 +32,14 @@ const taskSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    completedAt: Date,
+    review: {
+      type: Boolean,
+      default: false,
+    },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("Task", taskSchema);
+const Task = mongoose.model("Task", taskSchema);
+
+module.exports = Task;

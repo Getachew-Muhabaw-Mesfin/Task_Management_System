@@ -4,6 +4,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const connectDB = require("./config/mongoDb");
 const userRout = require("./routes/userManagement/userRoutes");
+const taskRoute = require("./routes/taskManagement/taskRoutes");
 
 // const AppError = require("./utils/appError");
 // const globalErrorHandler = require("./controllers/errorController");
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: false }));
 
 //Routes
 app.use("/api/v1/users", userRout);
+app.use("/api/v1/tasks", taskRoute);
 
 
 

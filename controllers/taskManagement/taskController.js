@@ -1,107 +1,124 @@
-const  Task  = require("../../models/task");
 const { StatusCodes } = require("http-status-codes");
+const Task = require("../../models/taskModel");
 
-// Create Task
+// Create a new task
 const createTask = async (req, res) => {
-  const { title, description, dueDate, priority, assignedTo } = req.body;
-  const createdBy = req.user.userId;
-
   try {
-    const newTask = new Task({
-      title,
-      description,
-      dueDate,
-      priority,
-      assignedTo,
-      createdBy,
-    });
-    await newTask.save();
-
+    const task = await Task.create({ ...req.body, createdBy: req.user._id });
     res.status(StatusCodes.CREATED).json({
       status: "success",
-      msg: "Task created successfully",
-      task: newTask,
+      msg: "Task created successfully1",
+      task,
     });
   } catch (error) {
-    console.error("Error creating task:", error.message);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       status: "fail",
-      msg: "Internal server error",
+      msg: "Task not created",
+      error: error.message,
     });
   }
 };
 
-// Update Task
-const updateTask = async (req, res) => {
-  const { id } = req.params;
-  const { title, description, dueDate, priority, assignedTo, completed } =
-    req.body;
-  const updatedTask = {
-    title,
-    description,
-    dueDate,
-    priority,
-    assignedTo,
-    completed,
-  };
-
+// Get all tasks created by the user
+const getAllTasks = async (req, res) => {
   try {
-    const task = await Task.findByIdAndUpdate(id, updatedTask, { new: true });
+    const tasks = await Task.find({ createdBy: req.user._id });
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      msg: "Tasks retrieved successfully",
+      tasks,
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: "fail",
+      task: "Tasks not retrieved",
+      error: error.message,
+    });
+  }
+};
+
+// Get a task by ID
+const getTaskById = async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
     if (!task) {
       return res.status(StatusCodes.NOT_FOUND).json({
         status: "fail",
         msg: "Task not found",
       });
     }
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      msg: "Task retrieved successfully",
+      task,
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: "fail",
+      task: "Task not retrieved",
+      error: error.message,
+    });
+  }
+};
 
+// Update a task
+const updateTask = async (req, res) => {
+  try {
+    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!task) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: "fail",
+        msg: "Task not found",
+      });
+    }
     res.status(StatusCodes.OK).json({
       status: "success",
       msg: "Task updated successfully",
       task,
     });
   } catch (error) {
-    console.error("Error updating task:", error.message);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       status: "fail",
-      msg: "Internal server error",
+      msg: "Task not updated",
+      error: error.message,
     });
   }
 };
 
-// Delete Task
+// Delete a task
 const deleteTask = async (req, res) => {
-  const { id } = req.params;
-
   try {
-    const task = await Task.findByIdAndDelete(id);
+    const task = await Task.findByIdAndDelete(req.params.id);
     if (!task) {
       return res.status(StatusCodes.NOT_FOUND).json({
         status: "fail",
         msg: "Task not found",
       });
     }
-
     res.status(StatusCodes.OK).json({
       status: "success",
       msg: "Task deleted successfully",
+      data: null,
     });
   } catch (error) {
-    console.error("Error deleting task:", error.message);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       status: "fail",
-      msg: "Internal server error",
+      msg: "Task not deleted",
+      error: error.message,
     });
   }
 };
 
-// Mark Task as Completed
-const markTaskCompleted = async (req, res) => {
-  const { id } = req.params;
-
+// Assign a task to a user
+const assignTask = async (req, res) => {
   try {
+    const { userId } = req.body;
     const task = await Task.findByIdAndUpdate(
-      id,
-      { completed: true, completedAt: Date.now() },
+      req.params.id,
+      { assignedTo: userId },
       { new: true }
     );
     if (!task) {
@@ -110,24 +127,83 @@ const markTaskCompleted = async (req, res) => {
         msg: "Task not found",
       });
     }
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      task,
+      msg: "Task assigned successfully",
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: "fail",
+      msg: "Task not assigned",
+      error: error.message,
+    });
+  }
+};
 
+// Mark a task as completed
+const markTaskCompleted = async (req, res) => {
+  try {
+    const task = await Task.findByIdAndUpdate(
+      req.params.id,
+      { completed: true },
+      { new: true }
+    );
+    if (!task) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: "fail",
+        msg: "Task not found",
+      });
+    }
     res.status(StatusCodes.OK).json({
       status: "success",
       msg: "Task marked as completed",
       task,
     });
   } catch (error) {
-    console.error("Error marking task as completed:", error.message);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       status: "fail",
-      msg: "Internal server error",
+      msg: "Task not marked as completed",
+      error: error.message,
+    });
+  }
+};
+
+// Mark a task for review
+const markTaskReview = async (req, res) => {
+  try {
+    const task = await Task.findByIdAndUpdate(
+      req.params.id,
+      { review: true },
+      { new: true }
+    );
+    if (!task) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: "fail",
+        msg: "Task not found",
+      });
+    }
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      task,
+      msg: "Task marked for review",
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: "fail",
+      msg: "Task not marked for review",
+      error: error.message,
     });
   }
 };
 
 module.exports = {
   createTask,
+  getAllTasks,
+  getTaskById,
   updateTask,
   deleteTask,
+  assignTask,
   markTaskCompleted,
+  markTaskReview,
 };
