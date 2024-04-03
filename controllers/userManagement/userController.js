@@ -2,7 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 const User = require("../../models/userModel");
 const { use } = require("../../routes/userManagement/userRoutes");
 
-// Get all users
+// Get all users TODO: Remove Password Filed
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
