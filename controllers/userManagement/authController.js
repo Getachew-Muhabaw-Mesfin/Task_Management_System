@@ -34,8 +34,6 @@ const login = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    console.log(user)
-
     if (!user) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: "fail",
@@ -55,7 +53,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "13h",
     });
 
     res.status(StatusCodes.OK).json({
@@ -68,7 +66,6 @@ const login = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
       },
-
     });
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -118,4 +115,16 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { signUp, login, resetPassword };
+const checkAuth = async (req, res) => {
+  res.status(StatusCodes.OK).json({
+    status: "success",
+    msg: "User is authenticated",
+    user: {
+      username: req.user.username,
+      email: req.user.email,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+    },
+  });
+};
+module.exports = { signUp, login, resetPassword, checkAuth };
