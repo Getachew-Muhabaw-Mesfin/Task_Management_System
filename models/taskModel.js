@@ -28,6 +28,10 @@ const taskSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
     completed: {
       type: Boolean,
       default: false,
