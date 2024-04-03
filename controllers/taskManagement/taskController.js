@@ -196,6 +196,43 @@ const markTaskReview = async (req, res) => {
     });
   }
 };
+const filteredTasks = async (req, res) => {
+  try {
+    let filter = { createdBy: req.user._id };
+
+    // Check if category filter is provided
+    if (req.query.category) {
+      filter.category = req.query.category;
+    }
+
+    // Check if priority filter is provided
+    if (req.query.priority) {
+      filter.priority = req.query.priority;
+    }
+
+    // Check if due date filter is provided
+    if (req.query.dueDate) {
+      filter.dueDate = { $lte: new Date(req.query.dueDate) };
+    }
+
+    // Add more filters as needed
+
+    const tasks = await Task.find(filter);
+
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      msg: "Filtered tasks retrieved successfully",
+      tasks,
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: "fail",
+      msg: "Tasks not retrieved",
+      error: error.message,
+    });
+  }
+};
+
 
 module.exports = {
   createTask,
@@ -206,4 +243,5 @@ module.exports = {
   assignTask,
   markTaskCompleted,
   markTaskReview,
+  filteredTasks,
 };
