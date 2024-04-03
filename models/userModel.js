@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -18,6 +19,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, "Please provide an email address"],
+    validate: [validator.isEmail, "Please provide a valid email address"],
     unique: true,
     lowercase: true,
   },
@@ -25,7 +27,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a password"],
     minlength: 6,
-    select: false, // Don't include password in query results by default
   },
   passwordResetToken: String,
   passwordResetExpires: Date,
