@@ -5,6 +5,9 @@ const morgan = require("morgan");
 const connectDB = require("./config/mongoDb");
 const userRout = require("./routes/userManagement/userRoutes");
 
+// const AppError = require("./utils/appError");
+// const globalErrorHandler = require("./controllers/errorController");
+
 //Connect to MongoDB
 connectDB();
 //Middlewares
@@ -17,8 +20,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+
 //Routes
-app.use("/api/v1/user", userRout);
+app.use("/api/v1/users", userRout);
+
+
 
 //Server
 const PORT = 5000;
