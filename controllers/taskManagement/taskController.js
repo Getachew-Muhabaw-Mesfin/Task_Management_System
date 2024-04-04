@@ -240,7 +240,6 @@ const markTaskReview = async (req, res) => {
   }
 };
 
-// Filter Task based on category and priority
 const filteredTask = async (req, res) => {
   try {
     let filter = { createdBy: req.user._id };
@@ -257,6 +256,9 @@ const filteredTask = async (req, res) => {
     if (req.query.dueDate) {
       filter.dueDate = { $gte: new Date(req.query.dueDate) };
     }
+
+    console.log("Filter:", filter);
+
     const tasks = await Task.find(filter);
 
     res.status(StatusCodes.OK).json({
@@ -272,6 +274,7 @@ const filteredTask = async (req, res) => {
     });
   }
 };
+
 
 module.exports = {
   createTask,
