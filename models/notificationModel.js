@@ -1,4 +1,3 @@
-// models/notificationModel.js
 const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema(
@@ -12,9 +11,18 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    read: {
-      type: Boolean,
-      default: false,
+    task: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Task",
+    },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
+    sharedWith: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true }
