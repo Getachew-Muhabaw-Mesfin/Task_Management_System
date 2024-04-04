@@ -205,7 +205,7 @@ const markTaskCompleted = async (req, res) => {
 // Mark Task as Review only the user who created the task can mark it as review
 const markTaskReview = async (req, res) => {
   try {
-    const taskId = String(req.params.id);
+    const taskId = req.params.id;
     const task = await Task.findById(taskId);
 
     if (!task) {
@@ -270,11 +270,10 @@ const filteredTask = async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       status: "fail",
       msg: "Tasks not retrieved",
-      error: error.message,
+      error,
     });
   }
 };
-
 
 module.exports = {
   createTask,
