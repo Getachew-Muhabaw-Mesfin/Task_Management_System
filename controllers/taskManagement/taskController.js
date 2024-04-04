@@ -122,13 +122,11 @@ const deleteTask = async (req, res) => {
   }
 };
 
-
 // Assign Task to a user only the user who created the task can assign it to another user
 const assignTask = async (req, res) => {
   try {
-    const { taskId, userId } = req.body;
-
-    // Find the task by ID
+    const taskId = req.params.id;
+    const { userId } = req.body; 
     const task = await Task.findById(taskId);
 
     if (!task) {
@@ -149,7 +147,6 @@ const assignTask = async (req, res) => {
     // Update the task with the new assigned user ID
     task.assignedTo = userId;
     await task.save();
-
     res.status(StatusCodes.OK).json({
       status: "success",
       msg: "Task assigned successfully",
@@ -164,12 +161,10 @@ const assignTask = async (req, res) => {
   }
 };
 
-
 // Mark Task as Completed only the user who created the task can mark it as completed
 const markTaskCompleted = async (req, res) => {
   try {
     const taskId = req.params.id;
-
     // Find the task by ID
     const task = await Task.findById(taskId);
 
@@ -204,7 +199,6 @@ const markTaskCompleted = async (req, res) => {
     });
   }
 };
-
 
 // Mark Task as Review only the user who created the task can mark it as review
 const markTaskReview = async (req, res) => {
@@ -241,7 +235,7 @@ const markTaskReview = async (req, res) => {
   }
 };
 
-
+// Filter Task based on category and priority
 const filteredTask = async (req, res) => {
   try {
     let filter = { createdBy: req.user._id };
@@ -251,6 +245,12 @@ const filteredTask = async (req, res) => {
     }
     if (req.query.priority) {
       filter.priority = req.query.priority;
+    }
+    if (req.query.completed) {
+      filter.completed = req.query.completed;
+    }
+    if (req.query.dueDate) {
+      filter.dueDate = { $gte: new Date(req.query.dueDate) };
     }
     const tasks = await Task.find(filter);
 
@@ -267,7 +267,6 @@ const filteredTask = async (req, res) => {
     });
   }
 };
-
 
 module.exports = {
   createTask,

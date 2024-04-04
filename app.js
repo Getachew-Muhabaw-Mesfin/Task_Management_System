@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: false }));
 
 //Routes
 app.use("/api/v1/users", userRout);
-// app.use("/api/v1/tasks", taskRoute);
+app.use("/api/v1/tasks", taskRoute);
 app.use("/api/v1/categories", taskCategory);
 
 //Server
