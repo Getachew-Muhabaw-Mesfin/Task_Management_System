@@ -10,7 +10,7 @@ const createCategory = catchAsync(async (req, res, next) => {
   const category = await Category.create({ name, description, user: userId });
   res.status(StatusCodes.CREATED).json({
     status: "success",
-    msg: "Category created successfully",
+    message: "Category created successfully",
     category,
   });
 });
@@ -20,7 +20,7 @@ const getAllCategories = catchAsync(async (req, res, next) => {
   const categories = await Category.find({ user: req.user._id });
   res.status(StatusCodes.OK).json({
     status: "success",
-    msg: "Categories retrieved successfully",
+    message: "Categories retrieved successfully",
     categories,
   });
 });
@@ -33,7 +33,7 @@ const getCategoryById = catchAsync(async (req, res, next) => {
   }
   res.status(StatusCodes.OK).json({
     status: "success",
-    msg: "Category retrieved successfully",
+    message: "Category retrieved successfully",
     category,
   });
 });
@@ -49,7 +49,7 @@ const updateCategory = catchAsync(async (req, res, next) => {
   }
   res.status(StatusCodes.OK).json({
     status: "success",
-    msg: "Category updated successfully",
+    message: "Category updated successfully",
     category,
   });
 });
@@ -62,7 +62,7 @@ const deleteCategory = catchAsync(async (req, res, next) => {
   }
   res.status(StatusCodes.OK).json({
     status: "success",
-    msg: "Category deleted successfully",
+    message: "Category deleted successfully",
     data: null,
   });
 });

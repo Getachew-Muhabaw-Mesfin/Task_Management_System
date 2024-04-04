@@ -18,7 +18,7 @@ const signUp = catchAsync(async (req, res, next) => {
   user.save();
   res.status(StatusCodes.CREATED).json({
     status: "success",
-    msg: "Signup successful",
+    message: "Signup successful",
     user,
   });
 });
@@ -43,7 +43,7 @@ const login = catchAsync(async (req, res, next) => {
   });
   res.status(StatusCodes.OK).json({
     status: "success",
-    msg: "Login successful",
+    message: "Login successful",
     token,
     user: {
       username: user.username,
@@ -70,7 +70,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
   res.status(StatusCodes.OK).json({
     status: "success",
-    msg: "Password reset successful",
+    message: "Password reset successful",
   });
 });
 
@@ -79,7 +79,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
 const checkAuth = async (req, res) => {
   res.status(StatusCodes.OK).json({
     status: "success",
-    msg: "User is authenticated",
+    message: "User is authenticated",
     user: req.user,
   });
 };

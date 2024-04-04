@@ -8,6 +8,7 @@ const taskRoute = require("./routes/taskManagement/taskRoutes");
 const taskCategory = require("./routes/taskOrganazation/taskCategoriesRoute");
 const taskColabAndCommRoute = require("./routes/taskColabAndComm/taskColabAndCommRoute");
 const reportRoute = require("./routes/DashboardReport/reportRoute");
+const publicAPIsRoute = require("./routes/publicAPIs/publicAPIsRoute");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/globalErrorHandler");
@@ -31,7 +32,7 @@ app.use("/api/v1/tasks", taskRoute);
 app.use("/api/v1/categories", taskCategory);
 app.use("/api/v1/collaboration", taskColabAndCommRoute);
 app.use("/api/v1/overview", reportRoute);
-
+app.use("/api/v1/public", publicAPIsRoute);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
