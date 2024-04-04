@@ -124,7 +124,6 @@ const sendReportByEmail = async (req, res) => {
 
     // Send email
     await transporter.sendMail(mailOptions);
-
     res.status(StatusCodes.OK).json({
       status: "success",
       msg: "Report sent via email successfully",
