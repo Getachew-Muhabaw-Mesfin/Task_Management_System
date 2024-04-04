@@ -6,7 +6,7 @@ const authMiddleware = async (req, res, next) => {
   if (!authHeader || !authHeader.startsWith("Bearer")) {
     return res.status(StatusCodes.UNAUTHORIZED).json({
       status: "fail",
-      msg: "No token provided",
+      msg: "Not authorized to access this route",
     });
   }
 
