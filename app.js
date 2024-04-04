@@ -7,6 +7,8 @@ const userRout = require("./routes/userManagement/userRoutes");
 const taskRoute = require("./routes/taskManagement/taskRoutes");
 const taskCategory = require("./routes/taskOrganazation/taskCategoriesRoute");
 const taskColabAndCommRoute = require("./routes/taskColabAndComm/taskColabAndCommRoute");
+const reportRoute = require("./routes/DashboardReport/reportRoute");
+
 
 // const AppError = require("./utils/appError");
 // const globalErrorHandler = require("./controllers/errorController");
@@ -29,6 +31,7 @@ app.use("/api/v1/users", userRout);
 app.use("/api/v1/tasks", taskRoute);
 app.use("/api/v1/categories", taskCategory);
 app.use("/api/v1/collaboration", taskColabAndCommRoute);
+app.use("/api/v1/overview", reportRoute);
 
 //Server
 const PORT = 5000;

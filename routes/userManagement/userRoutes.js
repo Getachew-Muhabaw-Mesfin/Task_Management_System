@@ -6,7 +6,6 @@ const {
   resetPassword,
   checkAuth,
 } = require("../../controllers/userManagement/authController");
-//TODO: make it on the app.js to all tasks
 const authMiddleware = require("../../middleware/authMiddleware");
 const {
   getAllUsers,
@@ -22,6 +21,7 @@ router.post("/reset-password", resetPassword);
 router.get("/checkAuth", authMiddleware, checkAuth);
 
 //User routes
+router.use(authMiddleware);
 router.get("/", getAllUsers);
 router.get("/:id", getUserById);
 router.patch("/:id", updateUser);
