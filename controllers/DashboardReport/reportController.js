@@ -1,88 +1,150 @@
 const { StatusCodes } = require("http-status-codes");
 const Task = require("../../models/taskModel");
+const catchAsync = require("../../utils/catchAsync");
+const AppError = require("../../utils/appError");
 
-const generateTaskCompletionReport = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const pendingTasks = await Task.countDocuments({
-      createdBy: userId,
-      status: "pending",
-    });
-    const assignedTasks = await Task.countDocuments({
-      createdBy: userId,
-      status: "assigned",
-    });
-    const reviewTasks = await Task.countDocuments({
-      createdBy: userId,
-      status: "review",
-    });
-    const completedTasks = await Task.countDocuments({
-      createdBy: userId,
-      status: "completed",
-    });
-    const overdueTasks = await Task.countDocuments({
-      createdBy: userId,
-      status: "overdue",
-    });
+// const generateTaskCompletionReport = async (req, res) => {
+//   try {
+//     const userId = req.user._id;
+//     const pendingTasks = await Task.countDocuments({
+//       createdBy: userId,
+//       status: "pending",
+//     });
+//     const assignedTasks = await Task.countDocuments({
+//       createdBy: userId,
+//       status: "assigned",
+//     });
+//     const reviewTasks = await Task.countDocuments({
+//       createdBy: userId,
+//       status: "review",
+//     });
+//     const completedTasks = await Task.countDocuments({
+//       createdBy: userId,
+//       status: "completed",
+//     });
+//     const overdueTasks = await Task.countDocuments({
+//       createdBy: userId,
+//       status: "overdue",
+//     });
 
-    // Calculate completion rates for each status
-    const totalTasks =
-      pendingTasks +
-      assignedTasks +
-      reviewTasks +
-      completedTasks +
-      overdueTasks;
-    const completionRates = {
-      pending: (pendingTasks / totalTasks) * 100,
-      assigned: (assignedTasks / totalTasks) * 100,
-      review: (reviewTasks / totalTasks) * 100,
-      completed: (completedTasks / totalTasks) * 100,
-      overdue: (overdueTasks / totalTasks) * 100,
-    };
+//     // Calculate completion rates for each status
+//     const totalTasks =
+//       pendingTasks +
+//       assignedTasks +
+//       reviewTasks +
+//       completedTasks +
+//       overdueTasks;
+//     const completionRates = {
+//       pending: (pendingTasks / totalTasks) * 100,
+//       assigned: (assignedTasks / totalTasks) * 100,
+//       review: (reviewTasks / totalTasks) * 100,
+//       completed: (completedTasks / totalTasks) * 100,
+//       overdue: (overdueTasks / totalTasks) * 100,
+//     };
 
-    // Prepare report data
-    const reportData = {
-      totalTasks,
-      completionRates,
-    };
+//     // Prepare report data
+//     const reportData = {
+//       totalTasks,
+//       completionRates,
+//     };
 
-    res.status(StatusCodes.OK).json({
-      status: "success",
-      msg: "Task completion report generated successfully",
-      reportData,
-    });
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: "fail",
-      msg: "Failed to generate task completion report",
-      error: error.message,
-    });
-  }
-};
-const getUserTasks = async (req, res) => {
-  try {
-    // Get user's tasks
-    const tasks = await Task.find({ createdBy: req.user._id }).populate(
-      "category"
-    );
+//     res.status(StatusCodes.OK).json({
+//       status: "success",
+//       msg: "Task completion report generated successfully",
+//       reportData,
+//     });
+//   } catch (error) {
+//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+//       status: "fail",
+//       msg: "Failed to generate task completion report",
+//       error: error.message,
+//     });
+//   }
+// };
 
-    // Filter tasks with upcoming deadlines
-    const today = new Date();
-    const upcomingTasks = tasks.filter((task) => task.dueDate > today);
+const generateTaskCompletionReport = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+  const pendingTasks = await Task.countDocuments({
+    createdBy: userId,
+    status: "pending",
+  });
+  const assignedTasks = await Task.countDocuments({
+    createdBy: userId,
+    status: "assigned",
+  });
+  const reviewTasks = await Task.countDocuments({
+    createdBy: userId,
+    status: "review",
+  });
+  const completedTasks = await Task.countDocuments({
+    createdBy: userId,
+    status: "completed",
+  });
+  const overdueTasks = await Task.countDocuments({
+    createdBy: userId,
+    status: "overdue",
+  });
 
-    res.status(StatusCodes.OK).json({
-      status: "success",
-      msg: "User dashboard data retrieved successfully",
-      tasks: upcomingTasks,
-    });
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: "fail",
-      msg: "Failed to retrieve user dashboard data",
-      error: error.message,
-    });
-  }
-};
+  //Calculate completion rates for each status
+  const totalTasks =
+    pendingTasks + assignedTasks + reviewTasks + completedTasks + overdueTasks;
+  const completionRates = {
+    pending: (pendingTasks / totalTasks) * 100,
+    assigned: (assignedTasks / totalTasks) * 100,
+    review: (reviewTasks / totalTasks) * 100,
+    completed: (completedTasks / totalTasks) * 100,
+    overdue: (overdueTasks / totalTasks) * 100,
+  };
+
+  // Prepare report data
+  const reportData = {
+    totalTasks,
+    completionRates,
+  };
+  res.status(StatusCodes.OK).json({
+    status: "success",
+    message: "Task completion report generated successfully",
+    reportData,
+  });
+});
+
+// const getUserTasks = async (req, res) => {
+//   try {
+//     // Get user's tasks
+//     const tasks = await Task.find({ createdBy: req.user._id }).populate(
+//       "category"
+//     );
+
+//     // Filter tasks with upcoming deadlines
+//     const today = new Date();
+//     const upcomingTasks = tasks.filter((task) => task.dueDate > today);
+
+//     res.status(StatusCodes.OK).json({
+//       status: "success",
+//       msg: "User dashboard data retrieved successfully",
+//       tasks: upcomingTasks,
+//     });
+//   } catch (error) {
+//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+//       status: "fail",
+//       msg: "Failed to retrieve user dashboard data",
+//       error: error.message,
+//     });
+//   }
+// };
+
+const getUserTasks = catchAsync(async (req, res, next) => {
+  const tasks = await Task.find({ createdBy: req.user._id }).populate(
+    "category"
+  );
+  const today = new Date();
+  const upcomingTasks = tasks.filter((task) => task.dueDate > today);
+  res.status(StatusCodes.OK).json({
+    status: "success",
+    message: "User dashboard data retrieved successfully",
+    tasks: upcomingTasks,
+  });
+});
 
 const sendReportByEmail = async (req, res) => {
   try {
