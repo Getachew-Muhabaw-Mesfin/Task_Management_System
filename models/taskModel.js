@@ -4,15 +4,15 @@ const taskSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Please provide a title for the task"],
+      required: true,
     },
     description: {
       type: String,
-      required: [true, "Please provide a description for the task"],
+      required: true,
     },
     dueDate: {
       type: Date,
-      required: [true, "Please provide a due date for the task"],
+      required: true,
     },
     priority: {
       type: String,
@@ -22,15 +22,12 @@ const taskSchema = new mongoose.Schema(
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
     },
     completed: {
       type: Boolean,
@@ -40,6 +37,16 @@ const taskSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
   },
   { timestamps: true }
 );
