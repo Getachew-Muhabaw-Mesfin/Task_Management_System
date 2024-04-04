@@ -6,7 +6,7 @@ const Category = require("../../models/categoryModel");
 const createCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
-    const userId = req.user._id; // Assuming user ID is available in the request
+    const userId = req.user._id; 
     const category = await Category.create({ name, description, user: userId });
     res.status(StatusCodes.CREATED).json({
       status: "success",

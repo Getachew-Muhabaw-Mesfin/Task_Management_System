@@ -33,7 +33,7 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
     if (!user) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: "fail",
@@ -75,6 +75,7 @@ const login = async (req, res) => {
     });
   }
 };
+
 
 const resetPassword = async (req, res) => {
   const { email, password, newPassword } = req.body;
@@ -119,12 +120,7 @@ const checkAuth = async (req, res) => {
   res.status(StatusCodes.OK).json({
     status: "success",
     msg: "User is authenticated",
-    user: {
-      username: req.user.username,
-      email: req.user.email,
-      firstName: req.user.firstName,
-      lastName: req.user.lastName,
-    },
+    user: req.user,
   });
 };
 module.exports = { signUp, login, resetPassword, checkAuth };
