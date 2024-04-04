@@ -24,6 +24,10 @@ const taskSchema = new mongoose.Schema(
       enum: ["pending", "assigned", "review", "completed", "overdue"],
       default: "pending",
     },
+    sharedWith: {
+      type: [mongoose.Schema.Types.ObjectId],
+      default: [],
+    },
     assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

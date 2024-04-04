@@ -7,7 +7,8 @@ const Comment = require("../../models/commentModel");
 // Handle commenting on tasks
 const addCommentToTask = async (req, res) => {
   try {
-    const { taskId, content } = req.body;
+    const taskId = req.params.taskId;
+    const { content } = req.body;
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -62,7 +63,8 @@ const notifyUser = async (req, res) => {
 // Handle sharing task with user
 const shareTaskWithUser = async (req, res) => {
   try {
-    const { taskId, userId } = req.body;
+    const taskId = req.params.taskId;
+    const { userId } = req.body;
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -91,7 +93,8 @@ const shareTaskWithUser = async (req, res) => {
 // Handle sharing category with user
 const shareCategoryWithUser = async (req, res) => {
   try {
-    const { categoryId, userId } = req.body;
+    const categoryId = req.params.categoryId;
+    const { userId } = req.body;
     const category = await Category.findById(categoryId);
     if (!category) {
       return res.status(StatusCodes.NOT_FOUND).json({

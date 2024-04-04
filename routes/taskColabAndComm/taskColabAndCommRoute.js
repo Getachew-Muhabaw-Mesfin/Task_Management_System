@@ -1,14 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const collaborationController = require("../../controllers/taskColabAndComm/taskColabAndCommController");
+const taskController = require("../../controllers/taskColabAndComm/taskColabAndCommController");
 const authMiddleware = require("../../middleware/authMiddleware");
 
 // Middleware to authenticate user
 router.use(authMiddleware);
 
-router.post("/comment", collaborationController.addCommentToTask);
-router.post("/notify", collaborationController.notifyUser);
-router.post("/share/task", collaborationController.shareTaskWithUser);
-router.post("/share/category", collaborationController.shareCategoryWithUser);
+router.post("/tasks/:taskId/comments", taskController.addCommentToTask);
+router.post("/notifications", taskController.notifyUser);
+router.post("/tasks/:taskId/share", taskController.shareTaskWithUser);
+router.post(
+  "/categories/:categoryId/share",
+  taskController.shareCategoryWithUser
+);
 
 module.exports = router;
