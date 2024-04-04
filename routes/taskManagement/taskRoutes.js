@@ -16,6 +16,6 @@ router.delete("/:id", taskController.deleteTask);
 router.patch("/:id/assign", taskController.assignTask);
 router.patch("/:id/complete", taskController.markTaskCompleted);
 router.patch("/:id/review", taskController.markTaskReview);
-router.get("/Query", taskController.filteredTask);
+router.get("", taskController.filteredTask);
 
 module.exports = router;

@@ -126,7 +126,7 @@ const deleteTask = async (req, res) => {
 const assignTask = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const { userId } = req.body; 
+    const { userId } = req.body;
     const task = await Task.findById(taskId);
 
     if (!task) {
@@ -146,6 +146,7 @@ const assignTask = async (req, res) => {
 
     // Update the task with the new assigned user ID
     task.assignedTo = userId;
+    task.status = "assigned";
     await task.save();
     res.status(StatusCodes.OK).json({
       status: "success",
@@ -174,6 +175,7 @@ const markTaskCompleted = async (req, res) => {
         msg: "Task not found",
       });
     }
+
     // Check if the current user is the creator of the task
     if (task.createdBy.toString() !== req.user._id.toString()) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -182,8 +184,8 @@ const markTaskCompleted = async (req, res) => {
       });
     }
 
-    // Update the task as completed
-    task.completed = true;
+    // Update the task status to completed
+    task.status = "completed";
     await task.save();
 
     res.status(StatusCodes.OK).json({
@@ -203,7 +205,7 @@ const markTaskCompleted = async (req, res) => {
 // Mark Task as Review only the user who created the task can mark it as review
 const markTaskReview = async (req, res) => {
   try {
-    const taskId = req.params.id;
+    const taskId = String(req.params.id);
     const task = await Task.findById(taskId);
 
     if (!task) {
@@ -212,15 +214,18 @@ const markTaskReview = async (req, res) => {
         msg: "Task not found",
       });
     }
+
+    // Check if the current user is the creator of the task
     if (task.createdBy.toString() !== req.user._id.toString()) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         status: "fail",
         msg: "You are not authorized to mark this task as review",
       });
     }
-    task.review = true;
-    await task.save();
 
+    // Update the task status to review
+    task.status = "review";
+    await task.save();
     res.status(StatusCodes.OK).json({
       status: "success",
       msg: "Task marked as review",
@@ -246,8 +251,8 @@ const filteredTask = async (req, res) => {
     if (req.query.priority) {
       filter.priority = req.query.priority;
     }
-    if (req.query.completed) {
-      filter.completed = req.query.completed;
+    if (req.query.status) {
+      filter.status = req.query.status;
     }
     if (req.query.dueDate) {
       filter.dueDate = { $gte: new Date(req.query.dueDate) };

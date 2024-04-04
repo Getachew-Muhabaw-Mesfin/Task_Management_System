@@ -19,19 +19,16 @@ const taskSchema = new mongoose.Schema(
       enum: ["low", "medium", "high"],
       default: "medium",
     },
+    status: {
+      type: String,
+      enum: ["pending", "assigned", "review", "completed", "overdue"],
+      default: "pending",
+    },
     assignedTo: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
-    completed: {
-      type: Boolean,
-      default: false,
-    },
-    review: {
-      type: Boolean,
-      default: false,
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
