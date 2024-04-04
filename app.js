@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const connectDB = require("./config/mongoDb");
 const userRout = require("./routes/userManagement/userRoutes");
 const taskRoute = require("./routes/taskManagement/taskRoutes");
+const taskCategory = require("./routes/taskOrganazation/taskOrganizations");
 
 // const AppError = require("./utils/appError");
 // const globalErrorHandler = require("./controllers/errorController");
@@ -21,12 +22,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-
 //Routes
 app.use("/api/v1/users", userRout);
 app.use("/api/v1/tasks", taskRoute);
-
-
+app.use("/api/v1/categories", taskCategory);
 
 //Server
 const PORT = 5000;

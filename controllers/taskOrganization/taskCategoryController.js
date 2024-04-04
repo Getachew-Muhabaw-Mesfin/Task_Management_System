@@ -1,92 +1,124 @@
-// controllers/categoryController.js
-const Category = require("../../models/categoryModel");
+// categoryController.js
 const { StatusCodes } = require("http-status-codes");
+const Category = require("../../models/categoryModel");
 
 // Create a new category
 const createCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
-    const user = req.user; // Assuming the user is authenticated and attached to the request
-    const newCategory = await Category.create({
-      name,
-      description,
-      user: user._id,
+    const userId = req.user._id; // Assuming user ID is available in the request
+    const category = await Category.create({ name, description, user: userId });
+    res.status(StatusCodes.CREATED).json({
+      status: "success",
+      msg: "Category created successfully",
+      category,
     });
-    res
-      .status(StatusCodes.CREATED)
-      .json({ status: "success", category: newCategory });
   } catch (error) {
-    console.error("Error creating category:", error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ status: "error", message: "Unable to create category" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: "fail",
+      msg: "Category not created",
+      error: error.message,
+    });
   }
 };
 
-// Get all categories for a user
-const getCategories = async (req, res) => {
+// Get all categories
+const getAllCategories = async (req, res) => {
   try {
-    const user = req.user; // Assuming the user is authenticated and attached to the request
-    const categories = await Category.find({ user: user._id });
-    res.status(StatusCodes.OK).json({ status: "success", data: categories });
+    const categories = await Category.find({ user: req.user._id });
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      msg: "Categories retrieved successfully",
+      categories,
+    });
   } catch (error) {
-    console.error("Error getting categories:", error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ status: "error", message: "Unable to get categories" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: "fail",
+      msg: "Categories not retrieved",
+      error: error.message,
+    });
+  }
+};
+
+// Get a category by ID
+const getCategoryById = async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: "fail",
+        msg: "Category not found",
+      });
+    }
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      msg: "Category retrieved successfully",
+      category,
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: "fail",
+      msg: "Category not retrieved",
+      error: error.message,
+    });
   }
 };
 
 // Update a category
 const updateCategory = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { name, description } = req.body;
-    const updatedCategory = await Category.findByIdAndUpdate(
-      id,
-      { name, description },
-      { new: true }
-    );
-    if (!updatedCategory) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ status: "fail", message: "Category not found" });
+    const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!category) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: "fail",
+        msg: "Category not found",
+      });
     }
-    res
-      .status(StatusCodes.OK)
-      .json({ status: "success", data: updatedCategory });
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      msg: "Category updated successfully",
+      category,
+    });
   } catch (error) {
-    console.error("Error updating category:", error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ status: "error", message: "Unable to update category" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: "fail",
+      msg: "Category not updated",
+      error: error.message,
+    });
   }
 };
 
 // Delete a category
 const deleteCategory = async (req, res) => {
   try {
-    const { id } = req.params;
-    const deletedCategory = await Category.findByIdAndDelete(id);
-    if (!deletedCategory) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ status: "fail", message: "Category not found" });
+    const category = await Category.findByIdAndDelete(req.params.id);
+    if (!category) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: "fail",
+        msg: "Category not found",
+      });
     }
-    res
-      .status(StatusCodes.OK)
-      .json({ status: "success", message: "Category deleted successfully" });
+    res.status(StatusCodes.OK).json({
+      status: "success",
+      msg: "Category deleted successfully",
+      data: null,
+    });
   } catch (error) {
-    console.error("Error deleting category:", error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ status: "error", message: "Unable to delete category" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: "fail",
+      msg: "Category not deleted",
+      error: error.message,
+    });
   }
 };
 
 module.exports = {
   createCategory,
-  getCategories,
+  getAllCategories,
+  getCategoryById,
   updateCategory,
   deleteCategory,
 };
