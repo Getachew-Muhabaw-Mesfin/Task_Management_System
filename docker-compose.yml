@@ -1,0 +1,22 @@
+
+version: "4"
+
+services:
+  mongo_db:
+    container_name: db_container
+    image: mongo:latest  # Or use a specific version for consistency
+    restart: always
+    volumes:
+      - mongo-data:/data/db  # Optional persistent data volume
+
+  api:
+    build: .  # Build from the current directory
+    ports:
+        - '5000:5000'
+    environment:
+        - MONGO_URI=${MONGO_URI}
+    env_file:
+        - .env
+
+volumes:
+  mongo-data: {}  
