@@ -31,6 +31,17 @@ const userSchema = new mongoose.Schema(
       minlength: 8,
       select: false,
     },
+    passwordConfirm: {
+      type: String,
+      required: [true, "Please confirm your password"],
+      validate: {
+        // This only works on CREATE and SAVE!!!
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: "Passwords are not the same!",
+      },
+    },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
@@ -47,16 +58,29 @@ userSchema.pre("save", async function (next) {
   }
   // Hash the password with a salt factor of 10
   this.password = await bcrypt.hash(this.password, 10);
+  this.passwordConfirm = undefined;
   next();
 });
-
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+  this.passwordChangedAt = Date.now() - 1000;
+  this.passwordConfirm = undefined;
+  this.passwordResetToken = undefined;
+  next();
+});
 // Method to compare entered password with stored encrypted password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 // Method to check if password was changed after token was issued
-userSchema.methods.createPasswordResetToken = () => {
+userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
   this.passwordResetToken = crypto
     .createHash("sha256")

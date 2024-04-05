@@ -5,6 +5,7 @@ const {
   login,
   forgotPassword,
   resetPassword,
+  updatePassword,
   checkAuth,
 } = require("../../controllers/userManagement/authController");
 const authMiddleware = require("../../middleware/authMiddleware");
@@ -24,6 +25,7 @@ router.get("/checkAuth", authMiddleware, checkAuth);
 
 //User routes
 router.use(authMiddleware);
+router.patch("/updateMyPassword", updatePassword);
 router.get("/", getAllUsers);
 router.get("/:id", getUserById);
 router.patch("/:id", updateUser);

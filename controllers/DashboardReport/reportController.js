@@ -64,60 +64,8 @@ const getUserTasks = catchAsync(async (req, res, next) => {
   });
 });
 
-const sendReportByEmail = async (req, res) => {
-  try {
-    // Get user email from request
-    const userEmail = req.user.email;
 
-    // Generate the task completion report
-    const report = await generateTaskCompletionReport();
-
-    // Prepare the report data in JSON format
-    const reportData = {
-      totalTasks: report.reportData.totalTasks,
-      completionRates: {
-        pending: report.reportData.completionRates.pending,
-        assigned: report.reportData.completionRates.assigned,
-        review: report.reportData.completionRates.review,
-        completed: report.reportData.completionRates.completed,
-        overdue: report.reportData.completionRates.overdue,
-      },
-      tasks: report.tasks, // Include list of tasks
-    };
-
-    // Create a Nodemailer transporter
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "your.email@gmail.com", // Your email address
-        pass: "yourpassword", // Your email password or app password
-      },
-    });
-
-    // Define email options
-    const mailOptions = {
-      from: "your.email@gmail.com", // Sender email address
-      to: userEmail, // Recipient email address
-      subject: "Task Completion Report", // Email subject
-      text: JSON.stringify(reportData, null, 2), // JSON representation of report data
-    };
-
-    // Send email
-    await transporter.sendMail(mailOptions);
-    res.status(StatusCodes.OK).json({
-      status: "success",
-      msg: "Report sent via email successfully",
-    });
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: "fail",
-      msg: "Failed to send report via email",
-      error: error.message,
-    });
-  }
-};
 module.exports = {
   generateTaskCompletionReport,
   getUserTasks,
-  sendReportByEmail,
 };

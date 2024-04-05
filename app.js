@@ -37,7 +37,6 @@ app.use("/api/v1/public", publicAPIsRoute);
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
-
 app.use(globalErrorHandler);
 //Server
 const PORT = 5000;
