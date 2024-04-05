@@ -1,4 +1,5 @@
 require("dotenv").config();
+//Packages Imports
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -7,6 +8,7 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 
+//File Imports
 const connectDB = require("./config/mongoDb");
 const userRout = require("./routes/userManagement/userRoutes");
 const taskRoute = require("./routes/taskManagement/taskRoutes");
@@ -15,6 +17,7 @@ const taskColabAndCommRoute = require("./routes/taskColabAndComm/taskColabAndCom
 const reportRoute = require("./routes/DashboardReport/reportRoute");
 const publicAPIsRoute = require("./routes/publicAPIs/publicAPIsRoute");
 
+// Global Error Handler
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/globalErrorHandler");
 
@@ -22,7 +25,6 @@ const globalErrorHandler = require("./controllers/globalErrorHandler");
 connectDB();
 //Middlewares
 const app = express();
-
 // Global Middlewares
 // Set security HTTP headers
 app.use(helmet());
@@ -41,6 +43,7 @@ app.use("/api", limiter); // For all routes that start with /api
 
 
 
+// Enable CORS
 app.use(cors());
 
 // Body parser, reading data from body into req.body
@@ -54,7 +57,7 @@ app.use(xss());
 
 app.use(express.urlencoded({ extended: false }));
 
-//Routes
+//API Routes
 app.use("/api/v1/users", userRout);
 app.use("/api/v1/tasks", taskRoute);
 app.use("/api/v1/categories", taskCategory);
