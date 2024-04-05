@@ -39,6 +39,32 @@ const login = catchAsync(async (req, res, next) => {
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "10d",
   });
+
+  //Implementing cookie
+  const jwtCookieExpiresIn = process.env.JWT_COOKIE_EXPIRES_IN;
+  let expiresInMilliseconds;
+
+  // Check if the value ends with 'd' denoting days
+  if (jwtCookieExpiresIn.endsWith("d")) {
+    const days = parseInt(jwtCookieExpiresIn, 10);
+    expiresInMilliseconds = days * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+  } else {
+    // If the value is not in days, you can handle other units or assume it's in milliseconds
+    expiresInMilliseconds = parseInt(jwtCookieExpiresIn, 10);
+  }
+
+  // Now you can use expiresInMilliseconds in your cookie options
+  const cookieOptions = {
+    expires: new Date(Date.now() + expiresInMilliseconds),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === "production") {
+    cookieOptions.secure = true;
+  }
+
+  res.cookie("jwt", token, cookieOptions);
+
   res.status(StatusCodes.OK).json({
     status: "success",
     message: "Login successful",
