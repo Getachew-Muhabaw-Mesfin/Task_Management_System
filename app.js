@@ -7,6 +7,7 @@ const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
+const hpp = require("hpp");
 
 //File Imports
 const connectDB = require("./config/mongoDb");
@@ -41,19 +42,22 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter); // For all routes that start with /api
 
-
-
 // Enable CORS
 app.use(cors());
 
 // Body parser, reading data from body into req.body
-app.use(express.json({ limit: "10kb"}));
-
+app.use(express.json({ limit: "10kb" }));
 //Data sanitization against NoSQL query injection e.g { $gt: ""}
 app.use(mongoSanitize());
-
 //Data sanitization against XSS
 app.use(xss());
+
+//Prevent parameter pollution
+app.use(
+  hpp({
+    whitelist: ["priority", "status", "category", "dueDate"],
+  })
+);
 
 app.use(express.urlencoded({ extended: false }));
 

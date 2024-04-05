@@ -161,7 +161,6 @@ const filteredTask = catchAsync(async (req, res, next) => {
   if (req.query.dueDate) {
     filter.dueDate = { $gte: new Date(req.query.dueDate) };
   }
-  console.log("Filter:", filter);
   const tasks = await Task.find(filter);
   res.status(StatusCodes.OK).json({
     status: "success",
