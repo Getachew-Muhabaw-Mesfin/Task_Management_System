@@ -2,6 +2,11 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
+
 const connectDB = require("./config/mongoDb");
 const userRout = require("./routes/userManagement/userRoutes");
 const taskRoute = require("./routes/taskManagement/taskRoutes");
@@ -18,12 +23,35 @@ connectDB();
 //Middlewares
 const app = express();
 
-// Logging
+// Global Middlewares
+// Set security HTTP headers
+app.use(helmet());
+
+// Development logging
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+//To Prevent Denial of Service (DOS) attack
+const limiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 60 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again after an hour",
+});
+app.use("/api", limiter); // For all routes that start with /api
+
+
+
 app.use(cors());
-app.use(express.json());
+
+// Body parser, reading data from body into req.body
+app.use(express.json({ limit: "10kb"}));
+
+//Data sanitization against NoSQL query injection e.g { $gt: ""}
+app.use(mongoSanitize());
+
+//Data sanitization against XSS
+app.use(xss());
+
 app.use(express.urlencoded({ extended: false }));
 
 //Routes
