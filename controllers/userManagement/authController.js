@@ -54,26 +54,23 @@ const login = catchAsync(async (req, res, next) => {
   });
 });
 
-const resetPassword = catchAsync(async (req, res, next) => {
-  const { email, password, newPassword } = req.body;
-  const user = await User.findOne({ email });
+//Forget Password
+const forgotPassword = catchAsync(async (req, res, next) => {
+  //1) Get user based on POSTed email
+  const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new AppError("Password reset failed", StatusCodes.NOT_FOUND));
-  }
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
     return next(
-      new AppError("Password reset failed", StatusCodes.UNAUTHORIZED)
+      new AppError("There is no user with email address", StatusCodes.NOT_FOUND)
     );
   }
-  user.password = newPassword;
-  await user.save();
-  res.status(StatusCodes.OK).json({
-    status: "success",
-    message: "Password reset successful",
-  });
+
+  //2) Generate the random reset token
+
+  //3) Send it to user's email
 });
 
+//RESET PASSWORD
+const resetPassword = catchAsync(async (req, res, next) => {});
 
 //CHECK AUTHENTICATION
 const checkAuth = async (req, res) => {
@@ -84,4 +81,4 @@ const checkAuth = async (req, res) => {
   });
 };
 
-module.exports = { signUp, login, resetPassword, checkAuth };
+module.exports = { signUp, login, resetPassword, forgotPassword, checkAuth };

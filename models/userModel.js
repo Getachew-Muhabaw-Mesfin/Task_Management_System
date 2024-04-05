@@ -1,40 +1,44 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const validator = require("validator");
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: [true, "Please provide a username"],
-    unique: true,
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: [true, "Please provide a username"],
+      unique: true,
+    },
+    firstName: {
+      type: String,
+      required: [true, "Please provide your first name"],
+    },
+    lastName: {
+      type: String,
+      required: [true, "Please provide your last name"],
+    },
+    email: {
+      type: String,
+      required: [true, "Please provide an email address"],
+      validate: [validator.isEmail, "Please provide a valid email address"],
+      unique: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+      minlength: 8,
+      select: false,
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
-  firstName: {
-    type: String,
-    required: [true, "Please provide your first name"],
-  },
-  lastName: {
-    type: String,
-    required: [true, "Please provide your last name"],
-  },
-  email: {
-    type: String,
-    required: [true, "Please provide an email address"],
-    validate: [validator.isEmail, "Please provide a valid email address"],
-    unique: true,
-    lowercase: true,
-  },
-  password: {
-    type: String,
-    required: [true, "Please provide a password"],
-    minlength: 8,
-    select: false,
-  },
-  passwordResetToken: String,
-  passwordResetExpires: Date,
-}, {
-  timestamps: true,
-
-});
+  {
+    timestamps: true,
+  }
+);
 
 // Encrypt password before saving user
 userSchema.pre("save", async function (next) {
@@ -49,6 +53,21 @@ userSchema.pre("save", async function (next) {
 // Method to compare entered password with stored encrypted password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Method to check if password was changed after token was issued
+userSchema.methods.createPasswordResetToken = () => {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  console.log({ resetToken }, this.passwordResetToken);
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);

@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   signUp,
   login,
+  forgotPassword,
   resetPassword,
   checkAuth,
 } = require("../../controllers/userManagement/authController");
@@ -17,7 +18,8 @@ const {
 //Auth routes
 router.post("/signup", signUp);
 router.post("/login", login);
-router.post("/reset-password", resetPassword);
+router.post("/forgotPassword", forgotPassword);
+router.patch("/resetPassword/:token", resetPassword);
 router.get("/checkAuth", authMiddleware, checkAuth);
 
 //User routes
